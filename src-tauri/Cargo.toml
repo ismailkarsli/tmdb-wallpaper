@@ -24,6 +24,7 @@ reqwest = { version = "0.11.11", features = ["json"] }
 text_io = "0.1.12"
 toml = "0.5.9"
 wallpaper = { version = "3.2.0" }
+clokwerk = "0.3.5"
 
 
 [features]

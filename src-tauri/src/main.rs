@@ -6,15 +6,23 @@
 mod config;
 mod lib;
 
+use clokwerk::{Scheduler, TimeUnits};
 use lib::tmdb::Tmdb;
 use rand::seq::{IteratorRandom, SliceRandom};
 use reqwest;
+use std::time::Duration;
 use std::{fs, path::PathBuf};
+use tauri::api::process;
 use tauri::{
-    CustomMenuItem, Manager, RunEvent, SystemTray, SystemTrayEvent, SystemTrayMenu,
+    AppHandle, CustomMenuItem, Manager, RunEvent, SystemTray, SystemTrayEvent, SystemTrayMenu,
     SystemTrayMenuItem, WindowEvent,
 };
 use wallpaper;
+
+#[tauri::command]
+fn restart_app(app_handle: AppHandle) {
+    process::restart(&app_handle.env());
+}
 
 #[tauri::command]
 fn save_settings(settings: &str) -> String {
@@ -29,6 +37,29 @@ fn get_settings() -> String {
 }
 
 fn main() {
+    println!("Starting background thread");
+
+    let mut scheduler = Scheduler::new();
+
+    let period = config::get("fetch_period").unwrap();
+
+    let period = match period.as_str() {
+        "every minute" => scheduler.every(1.minutes()),
+        "every half hour" => scheduler.every(30.minutes()),
+        "hourly" => scheduler.every(1.hours()),
+        "half day" => scheduler.every(12.hours()),
+        "daily" => scheduler.every(1.days()),
+        "weekly" => scheduler.every(1.weeks()),
+        "monthly" => scheduler.every(30.days()),
+        _ => scheduler.every(1.days()),
+    };
+
+    period.run(|| {
+        let _ = fetch_wallpaper();
+    });
+
+    let _ = scheduler.watch_thread(Duration::from_secs(30));
+
     let quit = CustomMenuItem::new("quit".to_string(), "Quit");
     let toggle_visibility = CustomMenuItem::new("toggle_visibility".to_string(), "Show/Hide");
     let tray_menu = SystemTrayMenu::new()
@@ -58,7 +89,11 @@ fn main() {
             },
             _ => {}
         })
-        .invoke_handler(tauri::generate_handler![save_settings, get_settings])
+        .invoke_handler(tauri::generate_handler![
+            restart_app,
+            save_settings,
+            get_settings
+        ])
         .build(tauri::generate_context!())
         .expect("error while running tauri application");
 
@@ -73,10 +108,10 @@ fn main() {
             _ => {}
         },
         _ => (),
-    })
+    });
 }
 
-async fn main2() {
+async fn fetch_wallpaper() {
     let tmdb_api_key: String = config::get("tmdb_api_key").unwrap();
     let session_id: Option<String> = config::get("session_id");
 
