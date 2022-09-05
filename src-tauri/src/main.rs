@@ -1,19 +1,85 @@
+#![cfg_attr(
+    all(not(debug_assertions), target_os = "windows"),
+    windows_subsystem = "windows"
+)]
+
 mod config;
 mod lib;
 
 use lib::tmdb::Tmdb;
 use rand::seq::{IteratorRandom, SliceRandom};
 use reqwest;
-use std::path::PathBuf;
-use tokio::fs;
+use std::{fs, path::PathBuf};
+use tauri::{
+    CustomMenuItem, Manager, RunEvent, SystemTray, SystemTrayEvent, SystemTrayMenu,
+    SystemTrayMenuItem, WindowEvent,
+};
 use wallpaper;
 
-#[tokio::main]
-async fn main() {
-    let (tmdb_api_key, session_id) = (
-        config::get("tmdb_api_key").unwrap(),
-        config::get("session_id"),
-    );
+#[tauri::command]
+fn save_settings(settings: &str) -> String {
+    let settings = serde_json::from_str(settings).unwrap();
+    config::set_all(settings);
+    format!("Settings saved!")
+}
+
+#[tauri::command]
+fn get_settings() -> String {
+    serde_json::to_string(&config::get_all()).unwrap()
+}
+
+fn main() {
+    let quit = CustomMenuItem::new("quit".to_string(), "Quit");
+    let toggle_visibility = CustomMenuItem::new("toggle_visibility".to_string(), "Show/Hide");
+    let tray_menu = SystemTrayMenu::new()
+        .add_item(toggle_visibility)
+        .add_native_item(SystemTrayMenuItem::Separator)
+        .add_item(quit);
+
+    let tray = SystemTray::new().with_menu(tray_menu);
+
+    let app = tauri::Builder::default()
+        .system_tray(tray)
+        .on_system_tray_event(|app, event| match event {
+            SystemTrayEvent::MenuItemClick { id, .. } => match id.as_str() {
+                "quit" => {
+                    std::process::exit(0);
+                }
+                "toggle_visibility" => {
+                    let window = app.get_window("main").unwrap();
+                    let is_visible = window.is_visible().unwrap();
+                    if is_visible {
+                        window.hide().unwrap();
+                    } else {
+                        window.show().unwrap();
+                    }
+                }
+                _ => {}
+            },
+            _ => {}
+        })
+        .invoke_handler(tauri::generate_handler![save_settings, get_settings])
+        .build(tauri::generate_context!())
+        .expect("error while running tauri application");
+
+    app.run(|app, event| match event {
+        RunEvent::ExitRequested { api, .. } => api.prevent_exit(),
+        RunEvent::WindowEvent { event, .. } => match event {
+            WindowEvent::CloseRequested { api, .. } => {
+                api.prevent_close();
+                let window = app.get_window("main").unwrap();
+                window.hide().unwrap();
+            }
+            _ => {}
+        },
+        _ => (),
+    })
+}
+
+async fn main2() {
+    let tmdb_api_key: String = config::get("tmdb_api_key").unwrap();
+    let session_id: Option<String> = config::get("session_id");
+
     let mut tmdb = Tmdb::new(tmdb_api_key, session_id);
 
     if tmdb.session_id.is_none() {
@@ -94,9 +160,7 @@ async fn main() {
     // Download the image to a file located in pictures folder
     let wallpaper_target: PathBuf = dirs::picture_dir().unwrap().join("wallpaper.jpg");
     let resp = reqwest::get(&image_url).await.unwrap();
-    fs::write(&wallpaper_target, resp.bytes().await.unwrap())
-        .await
-        .unwrap();
+    fs::write(&wallpaper_target, resp.bytes().await.unwrap()).unwrap();
 
     // Set the wallpaper
     wallpaper::set_from_path(&wallpaper_target.to_str().unwrap()).unwrap();
