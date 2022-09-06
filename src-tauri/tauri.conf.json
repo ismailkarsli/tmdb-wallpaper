@@ -65,10 +65,10 @@
     "windows": [
       {
         "fullscreen": false,
-        "height": 480,
+        "height": 700,
         "resizable": true,
         "title": "WallpaperFlix",
-        "width": 480,
+        "width": 500,
         "visible": false
       }
     ]
