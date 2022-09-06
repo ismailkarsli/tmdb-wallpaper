@@ -1,4 +1,4 @@
-/target
+src-tauri/target/*
 AppConfig.toml
 
 # Tauri defaults
