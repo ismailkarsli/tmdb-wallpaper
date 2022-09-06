@@ -6,7 +6,7 @@
 	"description": "A wallpaper downloader for desktop environments",
 	"author": "İsmail Karslı <cszn@protonmail.com> (https://ismail.karsli.net/)",
 	"contributors": [
-		"Hasan Ali Arıkan <mail>"
+		"Hasan Ali Arıkan hasanaliarikan077@gmail.com (https://hasanali.xyz)"
 	],
 	"scripts": {
 		"tauri": "tauri",
