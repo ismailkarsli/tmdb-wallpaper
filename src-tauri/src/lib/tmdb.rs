@@ -51,7 +51,7 @@ impl Tmdb {
         }
     }
 
-    pub async fn create_request_url(&self) -> String {
+    pub async fn create_request_token(&self) -> String {
         #[derive(Deserialize)]
         struct RequestTokenResponse {
             // success: bool,
@@ -68,7 +68,7 @@ impl Tmdb {
         .unwrap()
         .request_token;
 
-        return format!("https://www.themoviedb.org/authenticate/{}", request_token);
+        return request_token;
     }
 
     pub async fn create_session_id(&mut self, request_token: &str) -> Result<String, Error> {

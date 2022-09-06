@@ -2,6 +2,7 @@ use serde::{Deserialize, Serialize};
 use std::io::Read;
 
 const CONFIG_FILE: &str = "AppConfig.toml";
+static mut IS_CONFIG_FILE_READY: bool = false;
 
 #[derive(Serialize, Deserialize)]
 pub struct Config {
@@ -18,6 +19,7 @@ pub struct Config {
 }
 
 pub fn get(key: &str) -> Option<String> {
+    check_config_file();
     let mut file = std::fs::File::open(CONFIG_FILE).unwrap();
     let mut contents = String::new();
     file.read_to_string(&mut contents).unwrap();
@@ -39,6 +41,7 @@ pub fn get(key: &str) -> Option<String> {
 }
 
 pub fn set(key: &str, value: String) {
+    check_config_file();
     let mut file = std::fs::File::open(CONFIG_FILE).unwrap();
     let mut contents = String::new();
     file.read_to_string(&mut contents).unwrap();
@@ -61,13 +64,39 @@ pub fn set(key: &str, value: String) {
 }
 
 pub fn set_all(config: Config) {
+    check_config_file();
     let contents = toml::to_string(&config).unwrap();
     std::fs::write(CONFIG_FILE, contents).unwrap();
 }
 
 pub fn get_all() -> Config {
+    check_config_file();
     let mut file = std::fs::File::open(CONFIG_FILE).unwrap();
     let mut contents = String::new();
     file.read_to_string(&mut contents).unwrap();
     toml::from_str(&contents).unwrap()
+}
+
+fn check_config_file() {
+    if unsafe { !IS_CONFIG_FILE_READY } {
+        if !std::path::Path::new(CONFIG_FILE).exists() {
+            let config = Config {
+                tmdb_api_key: None,
+                session_id: None,
+                movies: true,
+                tv: true,
+                list_type: "popular".to_string(),
+                fetch_period: "daily".to_string(),
+                filter_photos_with_text: false,
+                language_of_photos: "en".to_string(),
+                width: None,
+                height: None,
+            };
+            let contents = toml::to_string(&config).unwrap();
+            std::fs::write(CONFIG_FILE, contents).unwrap();
+        }
+        unsafe {
+            IS_CONFIG_FILE_READY = true;
+        }
+    }
 }

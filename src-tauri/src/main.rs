@@ -7,12 +7,14 @@ mod config;
 mod lib;
 
 use clokwerk::{Scheduler, TimeUnits};
+use core::panic;
 use lib::tmdb::Tmdb;
 use rand::seq::{IteratorRandom, SliceRandom};
 use reqwest;
 use std::time::Duration;
 use std::{fs, path::PathBuf};
 use tauri::api::process;
+use tauri::async_runtime::block_on;
 use tauri::{
     AppHandle, CustomMenuItem, Manager, RunEvent, SystemTray, SystemTrayEvent, SystemTrayMenu,
     SystemTrayMenuItem, WindowEvent,
@@ -36,8 +38,38 @@ fn get_settings() -> String {
     serde_json::to_string(&config::get_all()).unwrap()
 }
 
-fn main() {
-    println!("Starting background thread");
+#[tauri::command]
+async fn create_request_token() -> String {
+    let tmdb_api_key: String = config::get("tmdb_api_key").unwrap();
+    let tmdb = Tmdb::new(tmdb_api_key, None);
+
+    let request_token: String = tmdb.create_request_token().await;
+    open::that(format!(
+        "https://www.themoviedb.org/authenticate/{}",
+        &request_token
+    ))
+    .ok();
+
+    return request_token;
+}
+
+#[tauri::command]
+async fn create_session_id(request_token: String) -> Result<String, String> {
+    let tmdb_api_key: String = config::get("tmdb_api_key").unwrap();
+    let mut tmdb = Tmdb::new(tmdb_api_key, None);
+    let session_id = tmdb.create_session_id(&request_token).await;
+    match session_id {
+        Ok(session_id) => {
+            config::set("session_id", session_id);
+            Ok("Session ID created!".to_string())
+        }
+        Err(_) => Err("Error creating session ID. Make sure you approve the link.".to_string()),
+    }
+}
+
+#[tokio::main]
+async fn main() {
+    let (tmdb_api_key, session_id) = (config::get("tmdb_api_key"), config::get("session_id"));
 
     let mut scheduler = Scheduler::new();
 
@@ -54,11 +86,9 @@ fn main() {
         _ => scheduler.every(1.days()),
     };
 
-    period.run(|| {
-        let _ = fetch_wallpaper();
-    });
+    period.run(|| block_on(fetch_wallpaper()));
 
-    let _ = scheduler.watch_thread(Duration::from_secs(30));
+    let _thread_handle = scheduler.watch_thread(Duration::from_secs(30));
 
     let quit = CustomMenuItem::new("quit".to_string(), "Quit");
     let toggle_visibility = CustomMenuItem::new("toggle_visibility".to_string(), "Show/Hide");
@@ -70,6 +100,12 @@ fn main() {
     let tray = SystemTray::new().with_menu(tray_menu);
 
     let app = tauri::Builder::default()
+        .setup(move |app| {
+            if tmdb_api_key.is_none() || session_id.is_none() {
+                app.get_window("main").unwrap().show().unwrap();
+            }
+            Ok(())
+        })
         .system_tray(tray)
         .on_system_tray_event(|app, event| match event {
             SystemTrayEvent::MenuItemClick { id, .. } => match id.as_str() {
@@ -92,7 +128,9 @@ fn main() {
         .invoke_handler(tauri::generate_handler![
             restart_app,
             save_settings,
-            get_settings
+            get_settings,
+            create_request_token,
+            create_session_id
         ])
         .build(tauri::generate_context!())
         .expect("error while running tauri application");
@@ -112,31 +150,14 @@ fn main() {
 }
 
 async fn fetch_wallpaper() {
+    println!("Fetching wallpaper");
     let tmdb_api_key: String = config::get("tmdb_api_key").unwrap();
     let session_id: Option<String> = config::get("session_id");
 
     let mut tmdb = Tmdb::new(tmdb_api_key, session_id);
 
     if tmdb.session_id.is_none() {
-        let request_url: String = tmdb.create_request_url().await;
-        open::that(&request_url).ok();
-        println!(
-            "Please approve the request token at {}. Once you approve, click enter here.",
-            request_url
-        );
-        loop {
-            let _i: i32 = text_io::read!("{}\n");
-            let session_id = tmdb.create_session_id(&request_url).await;
-            match session_id {
-                Ok(session_id) => {
-                    config::set("session_id", session_id);
-                    break;
-                }
-                Err(e) => {
-                    println!("Make sure you approved the request token. Error: {}", e);
-                }
-            }
-        }
+        return;
     }
 
     let options = vec!["movie", "tv"];
@@ -200,5 +221,4 @@ async fn fetch_wallpaper() {
     // Set the wallpaper
     wallpaper::set_from_path(&wallpaper_target.to_str().unwrap()).unwrap();
     wallpaper::set_mode(wallpaper::Mode::Crop).unwrap();
-    std::process::exit(0);
 }

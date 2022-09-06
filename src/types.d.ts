@@ -8,4 +8,5 @@ interface Settings {
 	language_of_photos: string;
 	width?: number;
 	height?: number;
+	session_id?: string;
 }
