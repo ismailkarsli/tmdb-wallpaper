@@ -9,10 +9,12 @@
 		"email": "cszn@protonmail.com"
 	},
 	"scripts": {
-		"dev": "vite",
-		"build": "vue-tsc --noEmit && vite build",
-		"preview": "vite preview",
 		"tauri": "tauri",
+		"dev": "tauri dev",
+		"build": "tauri build",
+		"ui-dev": "vite",
+		"ui-build": "vue-tsc --noEmit && vite build",
+		"ui-preview": "vite preview",
 		"prepare": "husky install"
 	},
 	"dependencies": {
