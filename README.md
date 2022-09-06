@@ -1,12 +1,12 @@
-# Required packages
+# Wallpaperflix
 
-libssl-dev, libayatana-appindicator
+Automatic wallpaper downloader of posters of your favorite movies and TV shows via TMDb.
 
-## Recommended IDE Setup
+### Prerequisities
 
-- [VS Code](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) + [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) + [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer)
+https://tauri.app/v1/guides/getting-started/prerequisites/
 
-## Type Support For `.vue` Imports in TS
+### Type Support For `.vue` Imports in TS
 
 Since TypeScript cannot handle type information for `.vue` imports, they are shimmed to be a generic Vue component type by default. In most cases this is fine if you don't really care about component prop types outside of templates. However, if you wish to get actual prop types in `.vue` imports (for example to get props validation when using manual `h(...)` calls), you can enable Volar's Take Over mode by following these steps:
 
