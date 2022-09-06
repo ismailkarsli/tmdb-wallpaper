@@ -4,10 +4,10 @@
 	"version": "0.0.0",
 	"type": "module",
 	"description": "A wallpaper downloader for desktop environments",
-	"author": {
-		"name": "İsmail Karslı",
-		"email": "cszn@protonmail.com"
-	},
+	"author": "İsmail Karslı <cszn@protonmail.com> (https://ismail.karsli.net/)",
+	"contributors": [
+		"Hasan Ali Arıkan <mail>"
+	],
 	"scripts": {
 		"tauri": "tauri",
 		"dev": "tauri dev",
