@@ -1,8 +1,0 @@
-tmdb_api_key = ""
-session_id = "c31b723e35aace429f1045a758a4d05a8ee46f73"
-movies = true
-tv = true
-list_type = "favorites"
-fetch_period = "every minute"
-filter_photos_with_text = false
-language_of_photos = "en"

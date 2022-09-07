@@ -19,5 +19,13 @@
 	"İnfo_1": "In order to use the application, you must first authorize with the API key.",
 	"İnfo_2": "Verify that the link validates sufficient TMDb status to authorize. press continue.",
 	"Response": "Response",
-	"Go": "Go Run"
+	"Go": "Go Run",
+
+	"every minute": "every minute",
+	"every half hour": "every half hour",
+	"hourly": "hourly",
+	"half a day": "half a day",
+	"daily": "daily",
+	"weekly": "weekly",
+	"monthly": "monthly"
 }

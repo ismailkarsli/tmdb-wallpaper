@@ -1,18 +1,23 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { invoke } from "@tauri-apps/api";
 import SessionIdModal from "./components/SessionIdModal.vue";
 import { useI18n } from "vue-i18n";
 
-const periods = [
-	{ name: "Dakika", value: "every minute" },
-	{ name: "Yarım saat", value: "every half hour" },
-	{ name: "Saat", value: "hourly" },
-	{ name: "12 saat", value: "half day" },
-	{ name: "Gün", value: "daily" },
-	{ name: "Hafta", value: "weekly" },
-	{ name: "Ay", value: "monthly" },
-];
+const { locale, t } = useI18n({
+	inheritLocale: true,
+	useScope: "global",
+});
+
+const periods = computed(() => [
+	{ name: t("every minute"), value: "every minute" },
+	{ name: t("every half hour"), value: "every half hour" },
+	{ name: t("hourly"), value: "hourly" },
+	{ name: t("half a day"), value: "half day" },
+	{ name: t("daily"), value: "daily" },
+	{ name: t("weekly"), value: "weekly" },
+	{ name: t("monthly"), value: "monthly" },
+]);
 
 const settings = ref<Settings>({
 	movies: true,
@@ -48,15 +53,8 @@ onMounted(async () => {
 		sessionIdModal.value = true;
 	}
 });
-const { locale, t } = useI18n({
-	inheritLocale: true,
-	useScope: "global",
-});
 </script>
 
-<i18n>
-
-</i18n>
 <template>
 	<div class="">
 		<select v-model="locale">

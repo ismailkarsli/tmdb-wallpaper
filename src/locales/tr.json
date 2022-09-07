@@ -19,5 +19,13 @@
 	"İnfo_1": "Uygulamayı kullanabilmek için öncelikle API key ile yetkilendirme yapmanız gerekmektedir.",
 	"İnfo_2": "Yetkilendirmek için aşağıdaki linke tıklayarak TMDb üzerinden doğrulama talebini doğrulayın. Sonrasında devam et butonuna basın.",
 	"Response": "Yanıt",
-	"Go": "Devam Et"
+	"Go": "Devam Et",
+
+	"every minute": "her dakika",
+	"every half hour": "her yarım saat",
+	"hourly": "her saat",
+	"half a day": "her yarım gün",
+	"daily": "her gün",
+	"weekly": "her hafta",
+	"monthly": "her ay"
 }

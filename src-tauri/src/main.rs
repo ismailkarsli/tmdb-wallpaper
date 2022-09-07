@@ -214,7 +214,9 @@ async fn fetch_wallpaper() {
     );
 
     // Download the image to a file located in pictures folder
-    let wallpaper_target: PathBuf = dirs::home_dir().unwrap().join("wallpaper.jpg");
+    let wallpaper_target: PathBuf = dirs::picture_dir()
+        .unwrap_or(dirs::home_dir().unwrap())
+        .join("wallpaper.jpg");
     let resp = reqwest::get(&image_url).await.unwrap();
     fs::write(&wallpaper_target, resp.bytes().await.unwrap()).unwrap();
 
