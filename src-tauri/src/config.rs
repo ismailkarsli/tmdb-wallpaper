@@ -6,16 +6,16 @@ static mut IS_CONFIG_FILE_READY: bool = false;
 
 #[derive(Serialize, Deserialize)]
 pub struct Config {
-    tmdb_api_key: Option<String>,
-    session_id: Option<String>,
-    movies: bool,
-    tv: bool,
-    list_type: String,
-    fetch_period: String,
-    filter_photos_with_text: bool,
-    language_of_photos: String,
-    width: Option<u32>,
-    height: Option<u32>,
+    pub tmdb_api_key: Option<String>,
+    pub session_id: Option<String>,
+    pub movies: bool,
+    pub tv: bool,
+    pub list_type: String,
+    pub fetch_period: String,
+    pub filter_photos_with_text: bool,
+    pub language_of_photos: Option<String>,
+    pub width: Option<u32>,
+    pub height: Option<u32>,
 }
 
 pub fn get(key: &str) -> Option<String> {
@@ -33,7 +33,7 @@ pub fn get(key: &str) -> Option<String> {
         "list_type" => Some(config.list_type.clone()),
         "fetch_period" => Some(config.fetch_period.clone()),
         "filter_photos_with_text" => Some(config.filter_photos_with_text.to_string()),
-        "language_of_photos" => Some(config.language_of_photos.clone()),
+        "language_of_photos" => config.language_of_photos.clone(),
         "width" => Some(config.width.unwrap_or(0).to_string()),
         "height" => Some(config.height.unwrap_or(0).to_string()),
         _ => None,
@@ -54,7 +54,7 @@ pub fn set(key: &str, value: String) {
         "list_type" => config.list_type = value,
         "fetch_period" => config.fetch_period = value,
         "filter_photos_with_text" => config.filter_photos_with_text = value == "true",
-        "language_of_photos" => config.language_of_photos = value,
+        "language_of_photos" => config.language_of_photos = Some(value),
         "width" => config.width = Some(value.parse::<u32>().unwrap()),
         "height" => config.height = Some(value.parse::<u32>().unwrap()),
         _ => (),
@@ -88,7 +88,7 @@ fn check_config_file() {
                 list_type: "watchlist".to_string(),
                 fetch_period: "daily".to_string(),
                 filter_photos_with_text: false,
-                language_of_photos: "en".to_string(),
+                language_of_photos: Some("en".to_string()),
                 width: Some(1280),
                 height: Some(720),
             };

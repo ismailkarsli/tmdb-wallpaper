@@ -8,8 +8,9 @@ mod lib;
 
 use clokwerk::{Scheduler, TimeUnits};
 use core::panic;
+use lib::tmdb::Image;
 use lib::tmdb::Tmdb;
-use rand::seq::{IteratorRandom, SliceRandom};
+use rand::seq::SliceRandom;
 use reqwest;
 use std::time::Duration;
 use std::{fs, path::PathBuf};
@@ -28,7 +29,10 @@ fn restart_app(app_handle: AppHandle) {
 
 #[tauri::command]
 fn save_settings(settings: &str) -> String {
-    let settings = serde_json::from_str(settings).unwrap();
+    let settings: config::Config = serde_json::from_str(settings).unwrap();
+    if !settings.movies && !settings.tv {
+        return "You must select at least one of the options".to_string();
+    }
     config::set_all(settings);
     format!("Settings saved!")
 }
@@ -86,7 +90,9 @@ async fn main() {
         _ => scheduler.every(1.days()),
     };
 
-    period.run(|| block_on(fetch_wallpaper()));
+    period.run(|| {
+        block_on(fetch_wallpaper()).ok();
+    });
 
     let _thread_handle = scheduler.watch_thread(Duration::from_secs(30));
 
@@ -149,39 +155,59 @@ async fn main() {
     });
 }
 
-async fn fetch_wallpaper() {
-    println!("Fetching wallpaper");
-    let tmdb_api_key: String = config::get("tmdb_api_key").unwrap();
-    let session_id: Option<String> = config::get("session_id");
+async fn fetch_wallpaper() -> Result<String, String> {
+    let config = config::get_all();
 
-    let mut tmdb = Tmdb::new(tmdb_api_key, session_id);
-
-    if tmdb.session_id.is_none() {
-        return;
+    if config.tmdb_api_key.is_none() || config.session_id.is_none() {
+        return Err("No TMDB API key or session ID".to_string());
     }
 
-    let options = vec!["movie", "tv"];
+    let mut tmdb = Tmdb::new(config.tmdb_api_key.unwrap(), config.session_id);
+
+    let mut options = vec![];
+    if config.movies {
+        options.push("movie");
+    };
+    if config.tv {
+        options.push("tv");
+    }
     let movie_or_tv = options.choose(&mut rand::thread_rng()).unwrap();
 
     struct MovieOrTV {
-        name: String,
+        // name: String,
         id: i32,
     }
     let selected_item;
     match movie_or_tv {
         &"movie" => {
-            let watchlist = tmdb.get_movie_watchlist().await;
+            let watchlist;
+            if config.list_type == "watchlist" {
+                watchlist = tmdb.get_movie_watchlist().await
+            } else {
+                watchlist = tmdb.get_movie_favorites().await
+            }
+            if watchlist.results.len() == 0 {
+                return Err(format!("No movies in {}.", config.list_type));
+            }
             let random_movie = watchlist.results.choose(&mut rand::thread_rng()).unwrap();
             selected_item = Some(MovieOrTV {
-                name: random_movie.title.clone(),
+                // name: random_movie.title.clone(),
                 id: random_movie.id,
             });
         }
         &"tv" => {
-            let watchlist = tmdb.get_tv_watchlist().await;
+            let watchlist;
+            if config.list_type == "watchlist" {
+                watchlist = tmdb.get_tv_watchlist().await
+            } else {
+                watchlist = tmdb.get_tv_favorites().await
+            }
+            if watchlist.results.len() == 0 {
+                return Err(format!("No TV shows in {}.", config.list_type));
+            }
             let random_tv = watchlist.results.choose(&mut rand::thread_rng()).unwrap();
             selected_item = Some(MovieOrTV {
-                name: random_tv.name.clone(),
+                // name: random_tv.name.clone(),
                 id: random_tv.id,
             });
         }
@@ -191,20 +217,34 @@ async fn fetch_wallpaper() {
     }
 
     let selected_item = selected_item.unwrap();
-    println!("Selected {}: {}", movie_or_tv, selected_item.name);
-
-    let images = match movie_or_tv {
-        &"movie" => tmdb.get_movie_images(selected_item.id).await,
-        &"tv" => tmdb.get_tv_images(selected_item.id).await,
-        _ => {
-            panic!("Invalid movie or tv selection");
-        }
+    let language = match config.filter_photos_with_text {
+        true => config.language_of_photos,
+        false => None,
     };
 
-    let usable_images = images
+    let images = match movie_or_tv {
+        &"movie" => tmdb.get_movie_images(selected_item.id, language).await,
+        &"tv" => tmdb.get_tv_images(selected_item.id, language).await,
+        _ => return Err("Invalid movie or tv selection".to_string()),
+    };
+
+    let usable_images: Vec<Image> = images
         .backdrops
         .into_iter()
-        .filter(|image| image.height > 1920 && image.width > 1080 && image.aspect_ratio > 1.75);
+        .filter(|image| {
+            image.height >= config.height.unwrap()
+                && image.width >= config.width.unwrap()
+                && image.aspect_ratio > 1.75
+        })
+        .collect();
+
+    if usable_images.len() == 0 {
+        return Err(format!(
+            "No usable images found with {}x{} resolution and aspect ratio greater than 1.75",
+            config.width.unwrap(),
+            config.height.unwrap()
+        ));
+    }
 
     let selected_image = usable_images.choose(&mut rand::thread_rng()).unwrap();
 
@@ -223,4 +263,6 @@ async fn fetch_wallpaper() {
     // Set the wallpaper
     wallpaper::set_from_path(&wallpaper_target.to_str().unwrap()).unwrap();
     wallpaper::set_mode(wallpaper::Mode::Crop).unwrap();
+
+    Ok("Wallpaper successfully set.".to_string())
 }

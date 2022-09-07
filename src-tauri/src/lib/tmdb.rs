@@ -34,8 +34,8 @@ pub struct TVWatchlistResponse {
 pub struct Image {
     pub aspect_ratio: f64,
     pub file_path: String,
-    pub height: i32,
-    pub width: i32,
+    pub height: u32,
+    pub width: u32,
 }
 #[derive(Deserialize)]
 pub struct ImagesResponse {
@@ -171,10 +171,51 @@ impl Tmdb {
         .unwrap();
     }
 
-    pub async fn get_movie_images(&self, movie_id: i32) -> ImagesResponse {
+    pub async fn get_movie_favorites(&mut self) -> MovieWatchlistResponse {
+        let account_id = self.get_account_id().await;
+
         return reqwest::get(format!(
-            "{}/movie/{}/images?api_key={}",
-            API_URL, movie_id, self.api_key
+            "{}/account/{}/favorite/movies?api_key={}&session_id={}",
+            API_URL,
+            account_id,
+            self.api_key,
+            self.session_id.as_ref().unwrap()
+        ))
+        .await
+        .unwrap()
+        .json::<MovieWatchlistResponse>()
+        .await
+        .unwrap();
+    }
+
+    pub async fn get_tv_favorites(&mut self) -> TVWatchlistResponse {
+        let account_id = self.get_account_id().await;
+
+        return reqwest::get(format!(
+            "{}/account/{}/favorite/tv?api_key={}&session_id={}",
+            API_URL,
+            account_id,
+            self.api_key,
+            self.session_id.as_ref().unwrap()
+        ))
+        .await
+        .unwrap()
+        .json::<TVWatchlistResponse>()
+        .await
+        .unwrap();
+    }
+
+    pub async fn get_movie_images(
+        &self,
+        movie_id: i32,
+        language: Option<String>,
+    ) -> ImagesResponse {
+        return reqwest::get(format!(
+            "{}/movie/{}/images?api_key={}&include_image_language={}",
+            API_URL,
+            movie_id,
+            self.api_key,
+            format!("null,xx,{}", language.unwrap_or("".to_string()))
         ))
         .await
         .unwrap()
@@ -183,10 +224,13 @@ impl Tmdb {
         .unwrap();
     }
 
-    pub async fn get_tv_images(&self, tv_id: i32) -> ImagesResponse {
+    pub async fn get_tv_images(&self, tv_id: i32, language: Option<String>) -> ImagesResponse {
         return reqwest::get(format!(
-            "{}/tv/{}/images?api_key={}",
-            API_URL, tv_id, self.api_key
+            "{}/tv/{}/images?api_key={}&include_image_language={}",
+            API_URL,
+            tv_id,
+            self.api_key,
+            format!("null,xx,{}", language.unwrap_or("".to_string()))
         ))
         .await
         .unwrap()
