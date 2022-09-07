@@ -1,0 +1,23 @@
+{
+	"Title": "Application Settings",
+	"Key": "TMDB Api Key",
+	"Refresh": "Refresh Frequency",
+	"Wallpaper": "What type of wallpaper?",
+	"Tv": "TV-Series",
+	"Movie": "Movies",
+	"List": "From which list should the photos be taken?",
+	"Watch": "Watch List",
+	"Favorites": "Favorites",
+	"Text_Photo": "Filter photos with text on them?",
+	"Filter": "Filter",
+	"Text": "Language",
+	"Size": "Desired photo resolution.",
+	"Width": "Width",
+	"Height": "Height",
+	"Save": "Save",
+	"TMDB_auth": "TMDB Authorization",
+	"İnfo_1": "In order to use the application, you must first authorize with the API key.",
+	"İnfo_2": "Verify that the link validates sufficient TMDb status to authorize. press continue.",
+	"Response": "Response",
+	"Go": "Go Run"
+}
