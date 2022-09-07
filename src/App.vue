@@ -1,53 +1,32 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue";
-import { invoke } from "@tauri-apps/api";
+import { onMounted, ref } from "vue";
 import SessionIdModal from "./components/SessionIdModal.vue";
 import { useI18n } from "vue-i18n";
+import { periods, useMainStore } from "./stores/main";
+import { storeToRefs } from "pinia";
 
 const { locale, t } = useI18n({
 	inheritLocale: true,
 	useScope: "global",
 });
 
-const periods = computed(() => [
-	{ name: t("every minute"), value: "every minute" },
-	{ name: t("every half hour"), value: "every half hour" },
-	{ name: t("hourly"), value: "hourly" },
-	{ name: t("half a day"), value: "half day" },
-	{ name: t("daily"), value: "daily" },
-	{ name: t("weekly"), value: "weekly" },
-	{ name: t("monthly"), value: "monthly" },
-]);
+const mainStore = useMainStore();
+const { settings } = storeToRefs(mainStore);
 
-const settings = ref<Settings>({
-	movies: true,
-	tv: true,
-	list_type: "watchlist",
-	fetch_period: "daily",
-	filter_photos_with_text: false,
-	language_of_photos: "en",
-	width: 1280,
-	height: 720,
-});
-
-const response = ref("");
 const sessionIdModal = ref(false);
 
 const onSubmit = async () => {
-	const res = await invoke("save_settings", {
-		settings: JSON.stringify(settings.value),
-	});
+	await mainStore.saveSettings();
 
-	response.value = String(res);
 	//TODO: show a dialog to the user that they need to restart the app
-	if (!settings.value.session_id) {
+
+	if (!settings.value.session_id && settings.value.tmdb_api_key) {
 		sessionIdModal.value = true;
 	}
 };
 
 onMounted(async () => {
-	const res = await invoke("get_settings");
-	settings.value = JSON.parse(String(res));
+	await mainStore.getSettings();
 
 	if (!settings.value.session_id && settings.value.tmdb_api_key) {
 		sessionIdModal.value = true;

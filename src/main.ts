@@ -1,6 +1,7 @@
 import "./styles.css";
 import { createApp } from "vue";
 import { createI18n } from "vue-i18n";
+import { createPinia } from "pinia";
 import App from "./App.vue";
 
 import en from "./locales/en.json";
@@ -15,5 +16,9 @@ const i18n = createI18n({
 		tr,
 	},
 });
+const pinia = createPinia();
+const app = createApp(App);
 
-createApp(App).use(i18n).mount("#app");
+app.use(i18n);
+app.use(pinia);
+app.mount("#app");

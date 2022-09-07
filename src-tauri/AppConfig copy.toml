@@ -1,0 +1,10 @@
+tmdb_api_key = "dc548922535024775987380e848be670"
+session_id = "f58f52cfd40aec7107327162b867c244a8eefce0"
+movies = true
+tv = true
+list_type = "watchlist"
+fetch_period = "every minute"
+filter_photos_with_text = true
+language_of_photos = "en"
+width = 1280
+height = 720

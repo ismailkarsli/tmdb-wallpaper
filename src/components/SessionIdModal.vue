@@ -1,19 +1,24 @@
 <script lang="ts" setup>
-import { invoke } from "@tauri-apps/api";
+import { storeToRefs } from "pinia";
 import { onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
+import { useMainStore } from "../stores/main";
 
 const emit = defineEmits(["close"]);
 
-const settings = ref<Settings>();
-const request_token = ref("");
-const response = ref("");
+const { t } = useI18n({
+	inheritLocale: true,
+	useScope: "global",
+});
+
+const mainStore = useMainStore();
+const { settings, request_token } = storeToRefs(mainStore);
+
+const response = ref<string | undefined>();
 
 const createSessionId = async () => {
 	try {
-		await invoke("create_session_id", {
-			requestToken: request_token.value,
-		});
+		await mainStore.createSessionId();
 		emit("close");
 	} catch (e) {
 		response.value = e as string;
@@ -21,22 +26,11 @@ const createSessionId = async () => {
 };
 
 onMounted(async () => {
-	const res = await invoke("get_settings");
-	settings.value = JSON.parse(String(res));
-
-	console.log(settings.value);
-
 	if (settings.value?.session_id) {
 		emit("close");
 		return;
 	}
-
-	request_token.value = await invoke("create_request_token");
-});
-
-const { locale, t } = useI18n({
-	inheritLocale: true,
-	useScope: "global",
+	await mainStore.createRequestToken();
 });
 </script>
 

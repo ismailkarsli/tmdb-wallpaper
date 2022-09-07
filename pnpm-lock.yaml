@@ -9,6 +9,7 @@ specifiers:
   autoprefixer: ^10.4.8
   husky: ^8.0.1
   lint-staged: ^13.0.3
+  pinia: ^2.0.22
   postcss: ^8.4.16
   prettier: 2.7.1
   tailwindcss: ^3.1.8
@@ -21,6 +22,7 @@ specifiers:
 dependencies:
   "@intlify/vite-plugin-vue-i18n": 6.0.1_vite@3.1.0+vue-i18n@9.2.2
   "@tauri-apps/api": 1.0.2
+  pinia: 2.0.22_pj7ch6rmow6odq73xb5hfvge3q
   vue: 3.2.38
   vue-i18n: 9.2.2_vue@3.2.38
 
@@ -33,7 +35,7 @@ devDependencies:
   lint-staged: 13.0.3
   postcss: 8.4.16
   prettier: 2.7.1
-  tailwindcss: 3.1.8
+  tailwindcss: 3.1.8_postcss@8.4.16
   typescript: 4.8.2
   vite: 3.1.0
   vue-tsc: 0.39.5_typescript@4.8.2
@@ -1419,6 +1421,25 @@ packages:
     engines: { node: ">=0.10.0" }
     dev: true
 
+  /pinia/2.0.22_pj7ch6rmow6odq73xb5hfvge3q:
+    resolution:
+      { integrity: sha512-u+b8/BC+tmvo3ACbYO2w5NfxHWFOjvvw9DQnyT0dW8aUMCPRQT5QnfZ5R5W2MzZBMTeZRMQI7V/QFbafmM9QHw== }
+    peerDependencies:
+      "@vue/composition-api": ^1.4.0
+      typescript: ">=4.4.4"
+      vue: ^2.6.14 || ^3.2.0
+    peerDependenciesMeta:
+      "@vue/composition-api":
+        optional: true
+      typescript:
+        optional: true
+    dependencies:
+      "@vue/devtools-api": 6.2.1
+      typescript: 4.8.2
+      vue: 3.2.38
+      vue-demi: 0.13.11_vue@3.2.38
+    dev: false
+
   /postcss-import/14.1.0_postcss@8.4.16:
     resolution:
       { integrity: sha512-flwI+Vgm4SElObFVPpTIT7SU7R3qk2L7PyduMcokiaVKuWv9d/U+Gm/QAd8NDLuykTWTkcrjOeD2Pp1rMeBTGw== }
@@ -1706,11 +1727,13 @@ packages:
       { integrity: sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w== }
     engines: { node: ">= 0.4" }
 
-  /tailwindcss/3.1.8:
+  /tailwindcss/3.1.8_postcss@8.4.16:
     resolution:
       { integrity: sha512-YSneUCZSFDYMwk+TGq8qYFdCA3yfBRdBlS7txSq0LUmzyeqRe3a8fBQzbz9M3WS/iFT4BNf/nmw9mEzrnSaC0g== }
     engines: { node: ">=12.13.0" }
     hasBin: true
+    peerDependencies:
+      postcss: ^8.0.9
     dependencies:
       arg: 5.0.2
       chokidar: 3.5.3
@@ -1771,7 +1794,6 @@ packages:
       { integrity: sha512-C0I1UsrrDHo2fYI5oaCGbSejwX4ch+9Y5jTQELvovfmFkK3HHSZJB8MSJcWLmCUBzQBchCrZ9rMRV6GuNrvGtw== }
     engines: { node: ">=4.2.0" }
     hasBin: true
-    dev: true
 
   /update-browserslist-db/1.0.7_browserslist@4.21.3:
     resolution:
@@ -1816,6 +1838,22 @@ packages:
       rollup: 2.78.1
     optionalDependencies:
       fsevents: 2.3.2
+
+  /vue-demi/0.13.11_vue@3.2.38:
+    resolution:
+      { integrity: sha512-IR8HoEEGM65YY3ZJYAjMlKygDQn25D5ajNFNoKh9RSDMQtlzCxtfQjdQgv9jjK+m3377SsJXY8ysq8kLCZL25A== }
+    engines: { node: ">=12" }
+    hasBin: true
+    requiresBuild: true
+    peerDependencies:
+      "@vue/composition-api": ^1.0.0-rc.1
+      vue: ^3.0.0-0 || ^2.6.0
+    peerDependenciesMeta:
+      "@vue/composition-api":
+        optional: true
+    dependencies:
+      vue: 3.2.38
+    dev: false
 
   /vue-i18n/9.2.2_vue@3.2.38:
     resolution:

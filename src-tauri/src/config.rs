@@ -85,12 +85,12 @@ fn check_config_file() {
                 session_id: None,
                 movies: true,
                 tv: true,
-                list_type: "popular".to_string(),
+                list_type: "watchlist".to_string(),
                 fetch_period: "daily".to_string(),
                 filter_photos_with_text: false,
                 language_of_photos: "en".to_string(),
-                width: None,
-                height: None,
+                width: Some(1280),
+                height: Some(720),
             };
             let contents = toml::to_string(&config).unwrap();
             std::fs::write(CONFIG_FILE, contents).unwrap();
