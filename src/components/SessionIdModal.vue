@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { invoke } from "@tauri-apps/api";
 import { onMounted, ref } from "vue";
+import { useI18n } from "vue-i18n";
 
 const emit = defineEmits(["close"]);
 
@@ -32,6 +33,11 @@ onMounted(async () => {
 
 	request_token.value = await invoke("create_request_token");
 });
+
+const { locale, t } = useI18n({
+	inheritLocale: true,
+	useScope: "global",
+});
 </script>
 
 <template>
@@ -42,16 +48,15 @@ onMounted(async () => {
 			<div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
 				<!-- Modal header -->
 				<div class="flex justify-between items-start p-4 rounded-t border-b dark:border-gray-600">
-					<h3 class="text-xl font-semibold text-gray-900 dark:text-white">TMDb Yetkilendirme</h3>
+					<h3 class="text-xl font-semibold text-gray-900 dark:text-white">{{ t("TMDB_auth") }}</h3>
 				</div>
 				<!-- Modal body -->
 				<div class="p-6 space-y-6 w-full">
 					<p class="text-base leading-relaxed text-gray-500 dark:text-gray-400">
-						Uygulamayı kullanabilmek için öncelikle API key ile yetkilendirme yapmanız gerekmektedir.
+						{{ t("İnfo_1") }}
 					</p>
 					<p class="text-base leading-relaxed text-gray-500 dark:text-gray-400">
-						Yetkilendirmek için aşağıdaki linke tıklayarak TMDb üzerinden doğrulama talebini doğrulayın. Sonrasında
-						devam et butonuna basın.
+						{{ t("İnfo_2") }}
 					</p>
 					<p class="break-all">
 						<a
@@ -62,7 +67,7 @@ onMounted(async () => {
 						</a>
 					</p>
 					<p v-if="response" class="break-all text-base leading-relaxed text-gray-500 dark:text-gray-400">
-						<b>Yanıt: </b>{{ response }}
+						<b>{{ t("Response") }}: </b>{{ response }}
 					</p>
 				</div>
 				<!-- Modal footer -->
@@ -71,7 +76,7 @@ onMounted(async () => {
 						@click="createSessionId"
 						type="button"
 						class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
-						Devam et
+						{{ t("Go") }}
 					</button>
 				</div>
 			</div>

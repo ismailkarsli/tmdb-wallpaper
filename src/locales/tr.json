@@ -1,0 +1,23 @@
+{
+	"Title": "Uygulama Ayarları",
+	"Key": "TMDB api Anahtarı",
+	"Refresh": "Yenileme Sıklığı",
+	"Wallpaper": "Hangi türden wallpaper çekmek istiyorsunuz?",
+	"Tv": "Diziler",
+	"Movie": "Filmler",
+	"List": "Fotoğraflar hangi listeden alınsın?",
+	"Watch": "İzleme Listesi",
+	"Favorites": "Favoriler",
+	"Text_Photo": "Üzerinde yazı olan fotoğraflar filtrelensin mi?",
+	"Filter": "Filtre",
+	"Text": "Dil",
+	"Size": "İstenen fotoğraf çözünürlüğü.",
+	"Width": "Genişlik",
+	"Height": "Yükseklik",
+	"Save": "Kaydet",
+	"TMDB_auth": "TMDB Yetkilendirme",
+	"İnfo_1": "Uygulamayı kullanabilmek için öncelikle API key ile yetkilendirme yapmanız gerekmektedir.",
+	"İnfo_2": "Yetkilendirmek için aşağıdaki linke tıklayarak TMDb üzerinden doğrulama talebini doğrulayın. Sonrasında devam et butonuna basın.",
+	"Response": "Yanıt",
+	"Go": "Devam Et"
+}
