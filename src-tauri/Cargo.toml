@@ -1,6 +1,6 @@
 [package]
 name = "wallpaperflix"
-version = "0.0.0"
+version = "0.0.1"
 description = "A wallpaper downloader for desktop environments"
 authors = ["you"]
 license = ""

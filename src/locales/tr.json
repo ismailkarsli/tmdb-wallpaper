@@ -10,7 +10,7 @@
 	"Favorites": "Favoriler",
 	"Text_Photo": "Üzerinde yazı olan fotoğraflar filtrelensin mi?",
 	"Filter": "Filtre",
-	"Text": "Dil",
+	"Language": "Dil",
 	"Size": "İstenen fotoğraf çözünürlüğü.",
 	"Width": "Genişlik",
 	"Height": "Yükseklik",
@@ -19,7 +19,7 @@
 	"İnfo_1": "Uygulamayı kullanabilmek için öncelikle API key ile yetkilendirme yapmanız gerekmektedir.",
 	"İnfo_2": "Yetkilendirmek için aşağıdaki linke tıklayarak TMDb üzerinden doğrulama talebini doğrulayın. Sonrasında devam et butonuna basın.",
 	"Response": "Yanıt",
-	"Go": "Devam Et",
+	"Go": "Devam et",
 
 	"every minute": "her dakika",
 	"every half hour": "her yarım saat",

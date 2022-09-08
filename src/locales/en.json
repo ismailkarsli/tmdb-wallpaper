@@ -10,7 +10,7 @@
 	"Favorites": "Favorites",
 	"Text_Photo": "Filter photos with text on them?",
 	"Filter": "Filter",
-	"Text": "Language",
+	"Language": "Language",
 	"Size": "Desired photo resolution.",
 	"Width": "Width",
 	"Height": "Height",
@@ -19,7 +19,7 @@
 	"İnfo_1": "In order to use the application, you must first authorize with the API key.",
 	"İnfo_2": "Verify that the link validates sufficient TMDb status to authorize. press continue.",
 	"Response": "Response",
-	"Go": "Go Run",
+	"Go": "Devam et",
 
 	"every minute": "every minute",
 	"every half hour": "every half hour",

@@ -15,7 +15,7 @@ export const useMainStore = defineStore("main", {
 			tv: true,
 			list_type: "watchlist",
 			fetch_period: "daily",
-			filter_photos_with_text: false,
+			filter_photos_with_text: true,
 			language_of_photos: "en",
 			width: 1280,
 			height: 720,

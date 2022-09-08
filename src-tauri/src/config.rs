@@ -87,7 +87,7 @@ fn check_config_file() {
                 tv: true,
                 list_type: "watchlist".to_string(),
                 fetch_period: "daily".to_string(),
-                filter_photos_with_text: false,
+                filter_photos_with_text: true,
                 language_of_photos: Some("en".to_string()),
                 width: Some(1280),
                 height: Some(720),

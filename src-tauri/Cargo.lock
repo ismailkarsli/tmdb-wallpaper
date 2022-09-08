@@ -3642,7 +3642,7 @@ dependencies = [
 
 [[package]]
 name = "wallpaperflix"
-version = "0.0.0"
+version = "0.0.1"
 dependencies = [
  "clokwerk",
  "dirs 4.0.0",

@@ -43,7 +43,6 @@ onMounted(async () => {
 
 		<SessionIdModal v-if="sessionIdModal" @close="sessionIdModal = false" />
 		<h1 class="text-center text-white text-2xl font-semibold mt-4">{{ t("Title") }}</h1>
-		<form></form>
 		<form class="mt-5" @submit.prevent="onSubmit">
 			<div class="ml-12">
 				<label class="block">
@@ -112,15 +111,20 @@ onMounted(async () => {
 								v-model="settings.filter_photos_with_text"
 								class="w-4 h-4 text-blue-600 bg-gray-100 rounded border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" />
 							<label class="ml-2 text-sm font-medium text-white">{{ t("Filter") }}</label>
-
-							<div v-if="!settings.filter_photos_with_text">
-								<label class="ml-2 text-sm font-medium text-white">{{ t("Text") }}</label>
-								<input
-									v-model="settings.language_of_photos"
-									class="ml-4 py-2 h-6 px-2 bg-gray-500 border border-gray-700 text-white rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" />
-							</div>
 						</div>
 					</label>
+				</div>
+
+				<div v-if="!settings.filter_photos_with_text" class="mt-2">
+					<label class="block text-sm font-medium text-white">
+						<span class="text-white">{{ t("Language") }}</span>
+					</label>
+
+					<div class="flex justify-self-center items-center">
+						<input
+							v-model="settings.language_of_photos"
+							class="bg-gray-500 px-2 py-2 border border-gray-700 text-white rounded text-sm h-7 w-[400px] mt-2 block focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500" />
+					</div>
 				</div>
 
 				<div class="mt-2">
