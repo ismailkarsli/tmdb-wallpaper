@@ -1,7 +1,7 @@
 {
 	"name": "wallpaperflix",
 	"private": true,
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"type": "module",
 	"description": "A wallpaper downloader for desktop environments",
 	"author": "İsmail Karslı <cszn@protonmail.com> (https://ismail.karsli.net/)",
