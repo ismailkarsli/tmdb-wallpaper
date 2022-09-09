@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
-import SessionIdModal from "./components/SessionIdModal.vue";
+import { onMounted, ref, watch } from "vue";
+import TmdbAuthModal from "./components/TmdbAuthModal.vue";
 import { useI18n } from "vue-i18n";
 import { periods, useMainStore } from "./stores/main";
 import { storeToRefs } from "pinia";
+import RestartModal from "./components/RestartModal.vue";
 
 const { locale, t } = useI18n({
 	inheritLocale: true,
@@ -13,35 +14,45 @@ const { locale, t } = useI18n({
 const mainStore = useMainStore();
 const { settings } = storeToRefs(mainStore);
 
-const sessionIdModal = ref(false);
+const authModal = ref(false);
+const isRestartRequired = ref(false);
+const restartModal = ref(false);
 
 const onSubmit = async () => {
 	await mainStore.saveSettings();
 
-	//TODO: show a dialog to the user that they need to restart the app
+	if (isRestartRequired.value) {
+		restartModal.value = true;
+	}
 
-	if (!settings.value.session_id && settings.value.tmdb_api_key) {
-		sessionIdModal.value = true;
+	if (!settings.value.session_id || !settings.value.tmdb_api_key) {
+		authModal.value = true;
 	}
 };
 
 onMounted(async () => {
 	await mainStore.getSettings();
 
-	if (!settings.value.session_id && settings.value.tmdb_api_key) {
-		sessionIdModal.value = true;
+	if (!settings.value.session_id || !settings.value.tmdb_api_key) {
+		authModal.value = true;
 	}
 });
+
+watch(
+	() => settings.value.fetch_period,
+	() => (isRestartRequired.value = true)
+);
 </script>
 
 <template>
 	<div class="">
-		<select v-model="locale">
-			<option value="en">en</option>
-			<option value="tr">tr</option>
-		</select>
-
-		<SessionIdModal v-if="sessionIdModal" @close="sessionIdModal = false" />
+		<TmdbAuthModal v-if="authModal" @close="authModal = false" />
+		<RestartModal
+			v-if="restartModal"
+			@close="
+				restartModal = false;
+				isRestartRequired = false;
+			" />
 		<h1 class="text-center text-white text-2xl font-semibold mt-4">{{ t("Title") }}</h1>
 		<form class="mt-5" @submit.prevent="onSubmit">
 			<div class="ml-12">

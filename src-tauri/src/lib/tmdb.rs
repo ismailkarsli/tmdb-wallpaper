@@ -51,7 +51,7 @@ impl Tmdb {
         }
     }
 
-    pub async fn create_request_token(&self) -> String {
+    pub async fn create_request_token(&self) -> Result<String, Box<dyn std::error::Error>> {
         #[derive(Deserialize)]
         struct RequestTokenResponse {
             // success: bool,
@@ -61,14 +61,12 @@ impl Tmdb {
             "{}/authentication/token/new?api_key={}",
             API_URL, self.api_key
         ))
-        .await
-        .unwrap()
+        .await?
         .json::<RequestTokenResponse>()
-        .await
-        .unwrap()
+        .await?
         .request_token;
 
-        return request_token;
+        Ok(request_token)
     }
 
     pub async fn create_session_id(&mut self, request_token: &str) -> Result<String, Error> {

@@ -16,10 +16,10 @@
 	"Height": "Yükseklik",
 	"Save": "Kaydet",
 	"TMDB_auth": "TMDB Yetkilendirme",
-	"İnfo_1": "Uygulamayı kullanabilmek için öncelikle API key ile yetkilendirme yapmanız gerekmektedir.",
-	"İnfo_2": "Yetkilendirmek için aşağıdaki linke tıklayarak TMDb üzerinden doğrulama talebini doğrulayın. Sonrasında devam et butonuna basın.",
+	"İnfo_1": "Şimdi TMDB'den aldığınız API anahtarı ile hesabınızı doğrulamanız gerekiyor. Yetkilendirme sayfasını açmak için aşağıdaki bağlantıya tıklayın.",
 	"Response": "Yanıt",
-	"Go": "Devam et",
+	"Continue": "Devam et",
+	"Cancel": "İptal",
 
 	"every minute": "her dakika",
 	"every half hour": "her yarım saat",

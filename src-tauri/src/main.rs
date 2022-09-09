@@ -51,19 +51,17 @@ fn get_settings() -> String {
 }
 
 #[tauri::command]
-async fn create_request_token() -> String {
+async fn create_request_token() -> Result<String, String> {
     let config: config::Config = confy::load(APP_NAME, None).unwrap();
     let tmdb_api_key = config.tmdb_api_key.unwrap();
     let tmdb = Tmdb::new(tmdb_api_key, None);
 
-    let request_token: String = tmdb.create_request_token().await;
-    open::that(format!(
-        "https://www.themoviedb.org/authenticate/{}",
-        &request_token
-    ))
-    .ok();
+    let request_token = tmdb.create_request_token().await;
 
-    return request_token;
+    match request_token {
+        Ok(token) => Ok(token),
+        Err(e) => Err(e.to_string()),
+    }
 }
 
 #[tauri::command]

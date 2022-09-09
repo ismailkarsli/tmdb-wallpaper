@@ -16,10 +16,10 @@
 	"Height": "Height",
 	"Save": "Save",
 	"TMDB_auth": "TMDB Authorization",
-	"İnfo_1": "In order to use the application, you must first authorize with the API key.",
-	"İnfo_2": "Verify that the link validates sufficient TMDb status to authorize. press continue.",
+	"İnfo_1": "Now you need to validate your account with the API key you received from TMDB. Click the button below to open the authorization page.",
 	"Response": "Response",
-	"Go": "Devam et",
+	"Continue": "Continue",
+	"Cancel": "Cancel",
 
 	"every minute": "every minute",
 	"every half hour": "every half hour",
