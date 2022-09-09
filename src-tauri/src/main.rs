@@ -22,29 +22,38 @@ use tauri::{
 };
 use wallpaper;
 
+pub static APP_NAME: &str = "WallpaperFlix";
+
 #[tauri::command]
 fn restart_app(app_handle: AppHandle) {
     process::restart(&app_handle.env());
 }
 
 #[tauri::command]
-fn save_settings(settings: &str) -> String {
-    let settings: config::Config = serde_json::from_str(settings).unwrap();
-    if !settings.movies && !settings.tv {
-        return "You must select at least one of the options".to_string();
+async fn manual_fetch() {
+    fetch_wallpaper().await.ok();
+}
+
+#[tauri::command]
+fn save_settings(settings: &str) -> Result<String, String> {
+    let config: config::Config = serde_json::from_str(settings).unwrap();
+    if !config.movies || !config.tv {
+        return Err("You must select at least one of movies or tv".to_string());
     }
-    config::set_all(settings);
-    format!("Settings saved!")
+    confy::store(APP_NAME, None, config).unwrap();
+    Ok(format!("Settings saved!"))
 }
 
 #[tauri::command]
 fn get_settings() -> String {
-    serde_json::to_string(&config::get_all()).unwrap()
+    let config: config::Config = confy::load(APP_NAME, None).unwrap();
+    serde_json::to_string(&config).unwrap()
 }
 
 #[tauri::command]
 async fn create_request_token() -> String {
-    let tmdb_api_key: String = config::get("tmdb_api_key").unwrap();
+    let config: config::Config = confy::load(APP_NAME, None).unwrap();
+    let tmdb_api_key = config.tmdb_api_key.unwrap();
     let tmdb = Tmdb::new(tmdb_api_key, None);
 
     let request_token: String = tmdb.create_request_token().await;
@@ -59,12 +68,14 @@ async fn create_request_token() -> String {
 
 #[tauri::command]
 async fn create_session_id(request_token: String) -> Result<String, String> {
-    let tmdb_api_key: String = config::get("tmdb_api_key").unwrap();
+    let mut config: config::Config = confy::load(APP_NAME, None).unwrap();
+    let tmdb_api_key = config.tmdb_api_key.clone().unwrap();
     let mut tmdb = Tmdb::new(tmdb_api_key, None);
     let session_id = tmdb.create_session_id(&request_token).await;
     match session_id {
         Ok(session_id) => {
-            config::set("session_id", session_id);
+            config.session_id = Some(session_id.clone());
+            confy::store(APP_NAME, None, config).unwrap();
             Ok("Session ID created!".to_string())
         }
         Err(_) => Err("Error creating session ID. Make sure you approve the link.".to_string()),
@@ -73,11 +84,11 @@ async fn create_session_id(request_token: String) -> Result<String, String> {
 
 #[tokio::main]
 async fn main() {
-    let (tmdb_api_key, session_id) = (config::get("tmdb_api_key"), config::get("session_id"));
+    let config: config::Config = confy::load(APP_NAME, None).unwrap();
+
+    let period = config.fetch_period.clone();
 
     let mut scheduler = Scheduler::new();
-
-    let period = config::get("fetch_period").unwrap();
 
     let period = match period.as_str() {
         "every minute" => scheduler.every(1.minutes()),
@@ -107,7 +118,7 @@ async fn main() {
 
     let app = tauri::Builder::default()
         .setup(move |app| {
-            if tmdb_api_key.is_none() || session_id.is_none() {
+            if config.tmdb_api_key.is_none() || config.session_id.is_none() {
                 app.get_window("main").unwrap().show().unwrap();
             }
             Ok(())
@@ -136,7 +147,8 @@ async fn main() {
             save_settings,
             get_settings,
             create_request_token,
-            create_session_id
+            create_session_id,
+            manual_fetch
         ])
         .build(tauri::generate_context!())
         .expect("error while running tauri application");
@@ -156,7 +168,7 @@ async fn main() {
 }
 
 async fn fetch_wallpaper() -> Result<String, String> {
-    let config = config::get_all();
+    let config: config::Config = confy::load(APP_NAME, None).unwrap();
 
     if config.tmdb_api_key.is_none() || config.session_id.is_none() {
         return Err("No TMDB API key or session ID".to_string());

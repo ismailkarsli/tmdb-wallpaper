@@ -26,6 +26,7 @@ toml = "0.5.9"
 wallpaper = { version = "3.2.0" }
 clokwerk = "0.3.5"
 tokio = { version = "1.21.0", features = ["full"] }
+confy = "0.5.0"
 
 
 [features]
